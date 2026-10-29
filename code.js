@@ -1,38 +1,31 @@
-/**
- * Kalkulator Kita - Google Apps Script Backend
- */
+function doPost(e) {
+  try {
+    // Memeriksa apakah ada data POST yang masuk
+    if (!e || !e.postData || !e.postData.contents) {
+      return ContentService.createTextOutput(JSON.stringify({ success: false, error: "Data POST kosong" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
 
-// Menampilkan halaman web HTML saat URL web app dibuka
-function doGet() {
-  return HtmlService.createTemplateFromFile('Index')
-    .evaluate()
-    .setTitle('Kalkulator Kita')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    var data = JSON.parse(e.postData.contents);
+    var formula = data.formula;
+    var result = data.result;
+    
+    // Pastikan Google Sheet aktif dan ambil sheet pertama
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    
+    // Menyimpan data ke baris baru: [Waktu, Formula/Perhitungan, Hasil]
+    sheet.appendRow([new Date(), formula, result]);
+    
+    return ContentService.createTextOutput(JSON.stringify({ success: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({ success: false, error: error.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
-/**
- * Menyimpan riwayat kalkulasi ke Google Sheet yang terhubung secara asynchronous.
- * @param {string} formula - Formula/ekspresi matematika yang dihitung.
- * @param {string|number} result - Hasil akhir kalkulasi.
- * @return {object} Status keberhasilan operasi.
- */
-function saveHistory(formula, result) {
-  try {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getActiveSheet();
-    
-    // Buat header jika sheet masih kosong
-    if (sheet.getLastRow() === 0) {
-      sheet.appendRow(["Timestamp", "Formula", "Hasil Akhir"]);
-      sheet.getRange(1, 1, 1, 3).setFontWeight("bold");
-    }
-    
-    var timestamp = new Date();
-    sheet.appendRow([timestamp, formula, result]);
-    
-    return { success: true };
-  } catch (error) {
-    return { success: false, error: error.toString() };
-  }
+// Fungsi tambahan untuk tes GET (opsional)
+function doGet(e) {
+  return ContentService.createTextOutput("Web App Aktif dan Berjalan Normal!");
 }
