@@ -345,22 +345,36 @@
         currentInput = finalResult.toString();
         currentNumber = finalResult.toString();
 
-        // Kirim hasil ke Google Sheets
-        if (typeof google !== 'undefined' && google.script && google.script.run) {
-          google.script.run
-            .withSuccessHandler(function(response) {
-              console.log('Berhasil disimpan ke Sheet:', response);
-            })
-            .withFailureHandler(function(error) {
-              console.error('Gagal menyimpan ke Sheet:', error);
-            })
-            .saveHistory(rawFormula, rawResult);
-        }
+      // 1. Definisikan URL Web App Google baru yang sudah Anda salin tadi
+const urlGoogleWebApp = "TEMPEL_URL_WEB_APP_GOOGLE_BARU_ANDA_DISINI";
 
-      } else {
-        resultEl.textContent = 'Error';
-      }
+// 2. Fungsi untuk mengirim riwayat kalkulator ke Google Sheet via Vercel
+function kirimKeGoogleSheet(formula, hasil) {
+  fetch(urlGoogleWebApp, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8" // Menggunakan text/plain agar terhindar dari pemblokiran keamanan browser (CORS)
+    },
+    body: JSON.stringify({
+      formula: formula,
+      result: hasil
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if(data.success) {
+      console.log("Riwayat berhasil disimpan ke Google Sheets!");
+    } else {
+      console.error("Gagal menyimpan ke Google Sheets:", data.error);
     }
+  })
+  .catch(error => console.error("Terjadi kesalahan jaringan:", error));
+}
+
+// 3. CONTOH CARA PAKAI: 
+// Panggil fungsi kirimKeGoogleSheet(formula, hasil) tepat di saat user menekan tombol sama dengan (=) 
+// Contoh: kirimKeGoogleSheet("5×2", "10");
+
 
     function formatNumber(num) {
       if (num === 'Error' || num === '' || num === null) return num;
