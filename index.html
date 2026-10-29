@@ -66,7 +66,6 @@
         button.equal {
             background-color: #28a745;
             color: white;
-            grid-column: span 1;
         }
         .status-text {
             color: #55b681;
@@ -110,7 +109,7 @@
 </div>
 
 <script>
-    // PENTING: Ganti tulisan di bawah ini dengan URL Web App dari Google Apps Script Anda yang berakhiran /exec
+    // Ganti URL di bawah ini jika URL Web App Anda berbeda
     const URL_GOOGLE_WEBAPP = "https://script.google.com/macros/s/AKfycbyjSzsK3N6isWAU6kqVQq-c0TU6EN-6jOfg9gYMhyhYSZ714HeyN_B4BpPfsjbvPtj6/exec";
 
     let displayElement = document.getElementById('display');
@@ -137,15 +136,13 @@
             if (currentInput === '') return;
             
             let formula = currentInput;
-            // Menghitung hasil matematika secara aman
             let hasil = eval(formula.replace(/×/g, '*').replace(/÷/g, '/'));
             
             displayElement.innerText = hasil;
             
-            // Format visual tampilan agar rapi saat dikirim ke Google Sheets
             let formulaTampilan = formula.replace(/\*/g, '×').replace(/\//g, '÷');
             
-            // Kirim data secara otomatis ke database Google Sheets
+            // Kirim data ke Google Sheet
             kirimKeGoogleSheet(formulaTampilan, hasil);
             
             currentInput = hasil.toString();
@@ -159,14 +156,15 @@
         statusElement.style.color = "#ff9f0a";
         statusElement.innerText = "Menyimpan ke Google Sheet...";
 
-        if (URL_GOOGLE_WEBAPP === "https://script.google.com/macros/s/AKfycbyjSzsK3N6isWAU6kqVQq-c0TU6EN-6jOfg9gYMhyhYSZ714HeyN_B4BpPfsjbvPtj6/exec") {
-            statusElement.style.color = "#red";
+        if (!URL_GOOGLE_WEBAPP || URL_GOOGLE_WEBAPP.includes("YOUR_WEB_APP_URL")) {
+            statusElement.style.color = "#ff4a4a";
             statusElement.innerText = "Gagal: URL Web App Google belum diisi!";
             return;
         }
 
-        fetch(URL_, {
+        fetch(URL_GOOGLE_WEBAPP, {
             method: "POST",
+            mode: "no-cors", // Mengatasi masalah CORS pada Google Apps Script
             headers: {
                 "Content-Type": "text/plain;charset=utf-8"
             },
@@ -175,15 +173,11 @@
                 result: hasil
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            if(data.success) {
-                statusElement.style.color = "#55b681";
-                statusElement.innerText = "✓ Riwayat berhasil disimpan!";
-            } else {
-                statusElement.style.color = "#ff4a4a";
-                statusElement.innerText = "Gagal menyimpan: " + data.error;
-            }
+        .then(() => {
+            // Karena menggunakan mode "no-cors", respons tidak bisa dibaca langsung sebagai JSON,
+            // namun data dipastikan terkirim ke Apps Script jika script backend benar.
+            statusElement.style.color = "#55b681";
+            statusElement.innerText = "✓ Riwayat berhasil dikirim!";
         })
         .catch(error => {
             statusElement.style.color = "#ff4a4a";
