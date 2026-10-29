@@ -111,7 +111,7 @@
 
 <script>
     // PENTING: Ganti tulisan di bawah ini dengan URL Web App dari Google Apps Script Anda yang berakhiran /exec
-    const URL_GOOGLE_WEBAPP = "https://script.google.com/macros/s/AKfycbwQtCzLJMVoG9IiqpriWXo93u98nK8hsKdDmdxbA6L8rtIlXx2Yh2CID49-ms3YGekg/exec";
+    const URL_GOOGLE_WEBAPP = "https://script.google.com/macros/s/AKfycbyjSzsK3N6isWAU6kqVQq-c0TU6EN-6jOfg9gYMhyhYSZ714HeyN_B4BpPfsjbvPtj6/exec";
 
     let displayElement = document.getElementById('display');
     let statusElement = document.getElementById('status');
@@ -159,13 +159,13 @@
         statusElement.style.color = "#ff9f0a";
         statusElement.innerText = "Menyimpan ke Google Sheet...";
 
-        if (URL_GOOGLE_WEBAPP === "https://script.google.com/macros/s/AKfycbwQtCzLJMVoG9IiqpriWXo93u98nK8hsKdDmdxbA6L8rtIlXx2Yh2CID49-ms3YGekg/exec") {
+        if (URL_GOOGLE_WEBAPP === "https://script.google.com/macros/s/AKfycbyjSzsK3N6isWAU6kqVQq-c0TU6EN-6jOfg9gYMhyhYSZ714HeyN_B4BpPfsjbvPtj6/exec") {
             statusElement.style.color = "#red";
             statusElement.innerText = "Gagal: URL Web App Google belum diisi!";
             return;
         }
 
-        fetch(URL_GOOGLE_WEBAPP, {
+        fetch(URL_, {
             method: "POST",
             headers: {
                 "Content-Type": "text/plain;charset=utf-8"
